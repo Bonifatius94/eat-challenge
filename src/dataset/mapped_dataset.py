@@ -16,17 +16,21 @@ def load_datasets(params: dict, dataset_path: str='./dataset'):
     train_data = train_data.batch(params['batch_size'])
     test_data = test_data.batch(params['batch_size'])
 
-    # tune the performance by prefetching data
+    # shuffle the training dataset properly
+    #train_data = train_data.shuffle(5)
+
+    # tune the performance by prefetching several batches in advance
     train_data = train_data.prefetch(5)
     test_data = test_data.prefetch(5)
-
-    # shuffle the training dataset properly
-    train_data = train_data.shuffle(5)
 
     return train_data, test_data
 
 
 def load_dataset(params: dict, dataset_path: str, wildcard: str):
+
+    # read audio sampling configuration settings
+    sample_rate = params['sample_rate']
+    target_steps = params['seconds_per_sample'] * params['sample_rate']
 
     # load audio file paths
     audio_files_wildcard = os.path.join(dataset_path, 'audio', f'*{ wildcard }*.wav')
@@ -40,24 +44,15 @@ def load_dataset(params: dict, dataset_path: str, wildcard: str):
     # create a mapped dataset from file paths
     dataset = tf.data.Dataset.from_tensor_slices((audio_filepaths))
 
-    # read audio sampling configuration settings
-    sample_rate = params['sample_rate']
-    target_steps = params['seconds_per_sample'] * params['sample_rate']
-
     # map the sample's label and audio file contents -> (audio content, label) tuples
-    get_label_func = lambda file: labels_by_file[os.path.basename(file.numpy().decode('ascii')[:-4])]
+    tf_get_label_func = lambda file: labels_by_file[os.path.basename(file.numpy().decode('ascii')[:-4])]
     dataset = dataset.map(lambda filepath: (
-            tf.py_function(load_audio_file, [filepath, sample_rate, target_steps], [tf.float32]),
-            tf.py_function(get_label_func, [filepath], [tf.int32])
+            tf.squeeze(tf.py_function(tf_load_audio_file, [filepath, sample_rate, target_steps], [tf.float32]), axis=0),
+            tf.py_function(tf_get_label_func, [filepath], [tf.int32])
         ),
-        num_parallel_calls=params['num_threads'],
+        num_parallel_calls=params['num_map_threads'],
         deterministic=False
     )
-    # info: when using the map() function, the audio content is only loaded when needed
-    #       -> data can be prefetched for better performance (multi-threading, etc.)
-    #       -> machine's RAM / GPU RAM won't explode from loading the dataset
-
-    # TODO: think of loading pre-processed melspectrograms (from TFRecord), no more raw wav files
 
     return dataset
 
@@ -75,7 +70,7 @@ def load_labels(labels_filepath: str):
     return dict(zip(file_names, subject_ids))
 
 
-def load_audio_file(audio_filepath: str, sample_rate: int, target_steps: int):
+def tf_load_audio_file(audio_filepath: str, sample_rate: int, target_steps: int):
 
     # load the wave file in waveform
     x, _ = librosa.load(audio_filepath.numpy(), sr=sample_rate)
