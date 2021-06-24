@@ -76,7 +76,7 @@ def load_labels(labels_filepath: str):
     subject_ids = df['subject_id']
 
     # return (file name, subject id) tuples as dictionary
-    return dict(zip(file_names, subject_ids)) # TODO: check if this works
+    return dict(zip(file_names, subject_ids))
 
 
 def load_audio_file(audio_filepath: str, sample_rate: int, target_steps: int):
