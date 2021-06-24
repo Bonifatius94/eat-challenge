@@ -1,0 +1,7 @@
+numpy
+tensorflow
+librosa
+matplotlib
+pandas
+
+# TODO: add exact versions
