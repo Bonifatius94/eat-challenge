@@ -37,10 +37,6 @@ def load_dataset(params: dict, dataset_path: str, wildcard: str):
     labels_filepath = glob.glob(labels_file_wildcard)[0]
     labels_by_file = load_labels(labels_filepath)
 
-    #print(labels_by_file.keys())
-    #print(labels_by_file['train_001'])
-    #pass
-
     # create a mapped dataset from file paths
     dataset = tf.data.Dataset.from_tensor_slices((audio_filepaths))
 
