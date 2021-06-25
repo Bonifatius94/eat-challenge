@@ -37,19 +37,19 @@ def run_naive_training():
     # define hyper-params required for creating the training session
     params = {
         # training hparams
-        'num_epochs': 15,
+        'num_epochs': 20,
         'batch_size': 16, # batch size seems to be very volatile
 
         # dataset hparams
         'num_train_samples': 945,
         'num_test_samples': 469,
         'seconds_per_sample': 4,
-        'sample_rate': 48000,
-        # 'sample_rate': 16000,
+        # 'sample_rate': 48000,
+        'sample_rate': 16000,
         'num_map_threads': 3,
         'num_classes': 7,
-        'melspec_shape': (128, 376, 1),
-        # 'melspec_shape': (128, 126, 1),
+        # 'melspec_shape': (128, 376, 1),
+        'melspec_shape': (128, 126, 1),
     }
 
     # load a dataset for testing purposes
