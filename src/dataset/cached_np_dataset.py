@@ -5,8 +5,10 @@ import tensorflow as tf
 import glob, sys, os
 import pandas as pd
 
+from dataset.utils import load_audio_file, load_labels
 
-def load_datasets(params: dict, dataset_path: str='./dataset'):
+
+def load_datasets(params: dict, dataset_path: str='./dataset', shuffle: bool=True):
 
     # load audio datasets
     train_data = load_dataset(params, dataset_path, 'train')
@@ -17,7 +19,7 @@ def load_datasets(params: dict, dataset_path: str='./dataset'):
     test_data = test_data.batch(params['batch_size'])
 
     # shuffle the training dataset properly
-    #train_data = train_data.shuffle(5)
+    if shuffle: train_data = train_data.shuffle(5)
 
     # tune the performance by prefetching several batches in advance
     train_data = train_data.prefetch(5)
@@ -50,40 +52,3 @@ def load_dataset(params: dict, dataset_path: str, wildcard: str):
     dataset = tf.data.Dataset.from_tensor_slices((spectrograms, labels))
 
     return dataset
-
-
-def load_labels(labels_filepath: str):
-
-    # load labels into a pandas data frame
-    df = pd.read_csv(labels_filepath, sep=';')
-
-    # extract the file_name and subject_id columns
-    file_names = df['file_name']
-    subject_ids = df['subject_id']
-
-    # return (file name, subject id) tuples as dictionary
-    return dict(zip(file_names, subject_ids))
-
-
-def load_audio_file(audio_filepath: str, sample_rate: int, target_steps: int):
-
-    # load the wave file in waveform
-    x, _ = librosa.load(audio_filepath, sr=sample_rate)
-    sampled_steps = x.shape[0]
-
-    # add zero-padding if the sample is too short
-    if sampled_steps < target_steps:
-        diff = target_steps - sampled_steps
-        padding = np.zeros(diff, dtype = np.int16)
-        x = np.concatenate((x, padding))
-
-    # cut samples that are too long
-    if sampled_steps > target_steps:
-        x = x[:target_steps]
-
-    # convert the waveform into a spectrogram
-    x = librosa.feature.melspectrogram(x, sr=sample_rate)
-    x = librosa.power_to_db(x)
-    x = np.expand_dims(x, axis=-1)
-
-    return x

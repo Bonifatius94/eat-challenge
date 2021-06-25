@@ -1,12 +1,11 @@
 
-import numpy as np
-import librosa
 import tensorflow as tf
-import glob, sys, os
-import pandas as pd
+import glob, os
+
+from dataset.utils import load_audio_file, load_labels
 
 
-def load_datasets(params: dict, dataset_path: str='./dataset'):
+def load_datasets(params: dict, dataset_path: str='./dataset', shuffle: bool=True):
 
     # load audio datasets
     train_data = load_dataset(params, dataset_path, 'train')
@@ -17,7 +16,7 @@ def load_datasets(params: dict, dataset_path: str='./dataset'):
     test_data = test_data.batch(params['batch_size'])
 
     # shuffle the training dataset properly
-    #train_data = train_data.shuffle(5)
+    if shuffle: train_data = train_data.shuffle(5)
 
     # tune the performance by prefetching several batches in advance
     train_data = train_data.prefetch(5)
@@ -41,54 +40,21 @@ def load_dataset(params: dict, dataset_path: str, wildcard: str):
     labels_filepath = glob.glob(labels_file_wildcard)[0]
     labels_by_file = load_labels(labels_filepath)
 
-    # create a mapped dataset from file paths
+    # create a dataset from audio file paths
     dataset = tf.data.Dataset.from_tensor_slices((audio_filepaths))
 
-    # map the sample's label and audio file contents -> (audio content, label) tuples
-    tf_get_label_func = lambda file: labels_by_file[os.path.basename(file.numpy().decode('ascii')[:-4])]
+    # define mapping functions for audo file preprocessing / label retrieval
+    tf_get_label = lambda file: labels_by_file[os.path.basename(file.numpy().decode('ascii')[:-4])]
+    tf_load_audio_file = lambda file, sr, steps: load_audio_file(file.numpy(), sr, steps)
+
+    # map the sample's audio features and label -> (audio content, label) tuples
     dataset = dataset.map(lambda filepath: (
-            tf.squeeze(tf.py_function(tf_load_audio_file, [filepath, sample_rate, target_steps], [tf.float32]), axis=0),
-            tf.py_function(tf_get_label_func, [filepath], [tf.int32])
+            tf.py_function(tf_load_audio_file, [filepath, sample_rate, target_steps], [tf.float32]),
+            tf.py_function(tf_get_label, [filepath], [tf.int32])
         ),
         num_parallel_calls=params['num_map_threads'],
         deterministic=False
     )
+    dataset = dataset.map(lambda x, y: (tf.squeeze(x, axis=0), y))
 
     return dataset
-
-
-def load_labels(labels_filepath: str):
-
-    # load labels into a pandas data frame
-    df = pd.read_csv(labels_filepath, sep=';')
-
-    # extract the file_name and subject_id columns
-    file_names = df['file_name']
-    subject_ids = df['subject_id']
-
-    # return (file name, subject id) tuples as dictionary
-    return dict(zip(file_names, subject_ids))
-
-
-def tf_load_audio_file(audio_filepath: str, sample_rate: int, target_steps: int):
-
-    # load the wave file in waveform
-    x, _ = librosa.load(audio_filepath.numpy(), sr=sample_rate)
-    sampled_steps = x.shape[0]
-
-    # add zero-padding if the sample is too short
-    if sampled_steps < target_steps:
-        diff = target_steps - sampled_steps
-        padding = np.zeros(diff, dtype = np.int16)
-        x = np.concatenate((x, padding))
-
-    # cut samples that are too long
-    if sampled_steps > target_steps:
-        x = x[:target_steps]
-
-    # convert the waveform into a spectrogram
-    x = librosa.feature.melspectrogram(x, sr=sample_rate)
-    x = librosa.power_to_db(x)
-    x = np.expand_dims(x, axis=-1)
-
-    return x
