@@ -10,9 +10,9 @@ from tensorflow.io import FixedLenFeature, FixedLenSequenceFeature
 from .mapped_dataset import load_dataset as load_mapped_dataset
 
 
-# create lambdas for tfrecord example feature creation
-_float_feature = lambda values: Feature(float_list=FloatList(value=values))
-_int64_feature = lambda values: Feature(int64_list=Int64List(value=values))
+# ===================================================================================
+#                         COMMON CONFIGURATION SETTINGS
+# ===================================================================================
 
 # define the name of the newly created tfrecord dataset sub-directory
 tfrecord_subdir = 'tfrecord'
@@ -20,6 +20,15 @@ tfrecord_subdir = 'tfrecord'
 # define the feature keys of each data example in the tfrecord file
 key_melspectrogram = 'melspectrogram'
 key_label = 'label'
+
+
+# ===================================================================================
+#                         WRITE TFRECORD DATASET TO FILE
+# ===================================================================================
+
+# create lambdas for tfrecord example feature creation
+_float_feature = lambda values: Feature(float_list=FloatList(value=values))
+_int64_feature = lambda values: Feature(int64_list=Int64List(value=values))
 
 
 def write_tfrecord_datasets(params: dict, dataset_path: str='./dataset'):
@@ -70,7 +79,8 @@ def serialize_example(melspectrogram, label):
 
 
 # ===================================================================================
-
+#                         READ TFRECORD DATASET FROM FILE
+# ===================================================================================
 
 def load_datasets(params: dict, dataset_path: str='./dataset', shuffle: bool=True):
 
