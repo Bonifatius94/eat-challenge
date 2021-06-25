@@ -1,31 +1,31 @@
 
 import numpy as np
-import librosa
 import tensorflow as tf
-import glob, sys, os
-import pandas as pd
+import glob, os
 
 from dataset.utils import load_audio_file, load_labels
 
 
 def load_datasets(params: dict, dataset_path: str='./dataset', shuffle: bool=True):
 
+    # TODO: implement train / eval / test splits
+
     # load audio datasets
     train_data = load_dataset(params, dataset_path, 'train')
-    test_data = load_dataset(params, dataset_path, 'test')
+    #test_data = load_dataset(params, dataset_path, 'test')
 
     # batch both datasets properly
     train_data = train_data.batch(params['batch_size'])
-    test_data = test_data.batch(params['batch_size'])
+    #test_data = test_data.batch(params['batch_size'])
 
     # shuffle the training dataset properly
     if shuffle: train_data = train_data.shuffle(5)
 
     # tune the performance by prefetching several batches in advance
     train_data = train_data.prefetch(5)
-    test_data = test_data.prefetch(5)
+    #test_data = test_data.prefetch(5)
 
-    return train_data, test_data
+    return train_data#, test_data
 
 
 def load_dataset(params: dict, dataset_path: str, wildcard: str):

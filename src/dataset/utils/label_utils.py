@@ -9,7 +9,14 @@ def load_labels(labels_filepath: str):
 
     # extract the file_name and subject_id columns
     file_names = df['file_name']
-    subject_ids = df['subject_id']
+    food_types = df['food_type']
+
+    # create a unique indexing dictionary
+    food_types_set = sorted(set(food_types))
+    type2id = dict([(food_types_set[i], i) for i in range(len(food_types_set))])
+
+    # apply the indices to the labels
+    food_types = [type2id[type] for type in food_types]
 
     # return (file name, subject id) tuples as dictionary
-    return dict(zip(file_names, subject_ids))
+    return dict(zip(file_names, food_types))

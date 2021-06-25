@@ -7,22 +7,24 @@ from dataset.utils import load_audio_file, load_labels
 
 def load_datasets(params: dict, dataset_path: str='./dataset', shuffle: bool=True):
 
+    # TODO: implement train / eval / test splits
+
     # load audio datasets
     train_data = load_dataset(params, dataset_path, 'train')
-    test_data = load_dataset(params, dataset_path, 'test')
+    #test_data = load_dataset(params, dataset_path, 'test')
 
     # batch both datasets properly
     train_data = train_data.batch(params['batch_size'])
-    test_data = test_data.batch(params['batch_size'])
+    #test_data = test_data.batch(params['batch_size'])
 
     # shuffle the training dataset properly
     if shuffle: train_data = train_data.shuffle(5)
 
     # tune the performance by prefetching several batches in advance
     train_data = train_data.prefetch(5)
-    test_data = test_data.prefetch(5)
+    #test_data = test_data.prefetch(5)
 
-    return train_data, test_data
+    return train_data#, test_data
 
 
 def load_dataset(params: dict, dataset_path: str, wildcard: str):
@@ -43,7 +45,7 @@ def load_dataset(params: dict, dataset_path: str, wildcard: str):
     # create a dataset from audio file paths
     dataset = tf.data.Dataset.from_tensor_slices((audio_filepaths))
 
-    # define mapping functions for audo file preprocessing / label retrieval
+    # define mapping functions for audio file preprocessing / label retrieval
     tf_get_label = lambda file: labels_by_file[os.path.basename(file.numpy().decode('ascii')[:-4])]
     tf_load_audio_file = lambda file, sr, steps: load_audio_file(file.numpy(), sr, steps)
 
