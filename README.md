@@ -25,4 +25,7 @@ python src/main.py
 TODO: add main script arguments to specify the training approach
 
 ## Training Results
-TODO: add the results here ...
+
+| Training | Approach Description                        | Test Acc. | Trained Weights                                   | Logs                                              |
+| -------- | ------------------------------------------- | --------- | ------------------------------------------------- | ------------------------------------------------- |
+| Naive    | Train on audio melspectrograms using Conv2D |      0.92 | https://megastore.uni-augsburg.de/get/uwXwBXYScZ/ | https://megastore.uni-augsburg.de/get/o3nDS5DN1U/ |
