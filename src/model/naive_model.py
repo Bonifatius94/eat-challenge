@@ -10,21 +10,22 @@ class NaiveEatModel(tf.keras.Model):
         super(NaiveEatModel, self).__init__()
 
         # first convolution layer with batch normalization and max pooling
-        self.nn_conv_1 = Conv2D(8, (3, 3), strides=1, padding='same')
-        self.norm_1 = BatchNormalization()
-        self.nn_act_1 = Activation('relu')
-        self.nn_pool_1 = MaxPooling2D()
+        self.nn_conv_1 = Conv2D(64, (3, 3), strides=1, padding='same')
+        self.nn_bnorm_1 = BatchNormalization()
+        self.act_1 = Activation('relu')
+        self.maxpool_1 = MaxPooling2D()
 
-        # second convolution layer only with max pooling, no padding, no activation
-        self.nn_conv_2 = Conv2D(16, (3, 3), strides=1, padding='valid')
-        self.nn_pool_2 = MaxPooling2D()
+        # second convolution layer only with max pooling
+        self.nn_conv_2 = Conv2D(32, (3, 3), strides=1, padding='same')
+        self.act_2 = Activation('relu')
+        self.maxpool_2 = MaxPooling2D()
 
         # add a dropout layer to filter conv signal noise
-        self.dropout_2 = Dropout(rate=0.5)
+        self.dropout = Dropout(rate=0.5)
 
         # output logits layer
         self.flatten = Flatten()
-        self.dense_out = Dense(num_classes, activation='softmax')
+        self.nn_dense_out = Dense(num_classes, activation='softmax')
 
 
     def call(self, inputs, training=False):
@@ -33,19 +34,19 @@ class NaiveEatModel(tf.keras.Model):
 
         # process the first convolution layer
         x = self.nn_conv_1(x)
-        x = self.norm_1(x)
-        x = self.nn_act_1(x)
-        x = self.nn_pool_1(x)
+        x = self.nn_bnorm_1(x, training)
+        x = self.act_1(x)
+        x = self.maxpool_1(x)
 
         # process the second convolution layer
         x = self.nn_conv_2(x)
-        x = self.nn_pool_2(x)
+        x = self.maxpool_2(x)
 
         # add a dropout layer to filter conv signal noise
-        if training: x = self.dropout_2(x)
+        x = self.dropout(x, training)
 
         # process the logits output layer
         x = self.flatten(x)
-        x = self.dense_out(x)
+        x = self.nn_dense_out(x)
 
         return x
