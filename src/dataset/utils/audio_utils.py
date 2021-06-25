@@ -19,7 +19,7 @@ def load_audio_file(audio_filepath: str, sample_rate: int, target_steps: int):
     if sampled_steps > target_steps:
         x = x[:target_steps]
 
-    # convert the waveform into a spectrogram
+    # convert the waveform into a spectrogram with log-scale
     x = librosa.feature.melspectrogram(x, sr=sample_rate)
     x = librosa.power_to_db(x)
     x = np.expand_dims(x, axis=-1)
