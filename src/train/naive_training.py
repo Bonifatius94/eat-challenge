@@ -23,8 +23,9 @@ class NaiveTrainingSession:
         self.model = self.load_model(params)
 
         # create model checkpoint manager
+        self.ckpt_dir = './trained_models/naive'
         self.model_ckpt_callback = ModelCheckpoint(
-            filepath='./trained_models/naive', save_weights_only=False,
+            filepath=self.ckpt_dir, save_weights_only=False,
             monitor='val_accuracy', mode='max', save_best_only=True)
 
         # create tensorboard logger
@@ -58,16 +59,18 @@ class NaiveTrainingSession:
         eval_data = self.train_data.skip(num_train_batches).take(num_eval_batches)
         test_data = self.train_data.skip(num_train_batches + num_eval_batches)
 
-        # evaluate the untrained model
+        # evaluate the untrained model on the test dataset
         self.model.evaluate(x=test_data)
 
         # do the training by fitting the model to the training dataset
-        history = self.model.fit(x=train_data, epochs=self.params['num_epochs'],
-                                 validation_data=eval_data,
-                                 callbacks=[self.tb_callback, self.model_ckpt_callback])
+        self.model.fit(x=train_data, epochs=self.params['num_epochs'],
+                       validation_data=eval_data,
+                       callbacks=[self.tb_callback, self.model_ckpt_callback])
 
-        # evaluate the trained model
-        # TODO: load the best model from checkpoint, first
+        # load the best model from checkpoint cache
+        ckpt = tf.train.Checkpoint(optimizer=Adam(), net=self.model)
+        ckpt_manager = tf.train.CheckpointManager(ckpt, self.ckpt_dir, max_to_keep=1)
+        ckpt.restore(ckpt_manager.latest_checkpoint).expect_partial()
+
+        # evaluate the 'best' model checkpoint on the test dataset
         self.model.evaluate(x=test_data)
-
-        # TODO: write the history to tensorboard (or at least some matplotlib diagrams)
