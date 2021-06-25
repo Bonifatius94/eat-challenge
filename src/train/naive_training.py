@@ -35,15 +35,8 @@ class NaiveTrainingSession:
 
     def run_training(self):
 
-        # make the datasets iterable
-        train_data_iter = iter(self.train_data)
-        test_data_iter = iter(self.test_data)
-
-        # print first training batch
-        print(train_data_iter.next())
-
         # do the training by fitting the model to the training dataset
-        history = self.model.fit(x=train_data_iter, epochs=self.params['num_epochs'],
-                                 validation_data=test_data_iter)
+        history = self.model.fit(x=self.train_data, epochs=self.params['num_epochs'],
+                                 validation_data=self.test_data)
 
         # TODO: write the history to tensorboard (or at least some matplotlib diagrams)

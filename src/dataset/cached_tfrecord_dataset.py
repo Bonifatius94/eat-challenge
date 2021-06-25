@@ -1,15 +1,13 @@
 
-import numpy as np
-import librosa
 import tensorflow as tf
 import glob, os
-import pandas as pd
 
-from .mapped_dataset import load_dataset as load_mapped_dataset
 from tensorflow.data import TFRecordDataset
 from tensorflow.data.experimental import TFRecordWriter
 from tensorflow.train import Example, Feature, Features, FloatList, Int64List
 from tensorflow.io import FixedLenFeature, FixedLenSequenceFeature
+
+from .mapped_dataset import load_dataset as load_mapped_dataset
 
 
 # create lambdas for tfrecord example feature creation
@@ -94,9 +92,9 @@ def load_dataset(dataset_path: str, wildcard: str):
 
     # define tfrecord dataset features to be parsed
     feature_description = {
-        'melspectrogram': tf.io.FixedLenSequenceFeature(shape=(128, 126, 1), dtype=tf.float32,
+        'melspectrogram': FixedLenSequenceFeature(shape=(128, 126, 1), dtype=tf.float32,
                                                         default_value=0.0, allow_missing=True),
-        'label': tf.io.FixedLenFeature(shape=[], dtype=tf.int64, default_value=0)
+        'label': FixedLenFeature(shape=[], dtype=tf.int64, default_value=0)
     }
 
     # create a tfrecord dataset from file and extract features
@@ -106,8 +104,3 @@ def load_dataset(dataset_path: str, wildcard: str):
     dataset = dataset.map(lambda x, y: (tf.squeeze(x, axis=0), y))
 
     return dataset
-
-
-
-
-
