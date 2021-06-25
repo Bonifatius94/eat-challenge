@@ -16,16 +16,31 @@ you should be ready to run / develop the project code.
 ```
 
 ## How to Run
+First, cache the audio input data (melspectrogram) as TFRecord files.
+This should massively improve your training performance.
 
 ```sh
-# run the project's startup script
-python src/main.py
+# cache the melspectrograms dataset as TFRecord file
+python src/main.py preprocess_dataset
 ```
 
-TODO: add main script arguments to specify the training approach
+Now, you can launch a training session (e.g. the naive training).
+
+```sh
+# process a naive training session
+python src/main.py naive_training
+```
+
+After that you can sample all inputs of the unknown test dataset using a trained model
+and export the prediction results for EAT challenge submission.
+
+```sh
+# evaluate trained model results for submission
+# TODO: add the command when the export function is ready to use
+```
 
 ## Training Results
 
 | Training | Approach Description                        | Test Acc. | Trained Weights                                   | Logs                                              |
 | -------- | ------------------------------------------- | --------- | ------------------------------------------------- | ------------------------------------------------- |
-| Naive    | Train on audio melspectrograms using Conv2D |      0.92 | https://megastore.uni-augsburg.de/get/uwXwBXYScZ/ | https://megastore.uni-augsburg.de/get/o3nDS5DN1U/ |
+| Naive    | Train on audio melspectrograms using Conv2D |      0.34 | https://megastore.uni-augsburg.de/get/zWkOmMK5qK/ | https://megastore.uni-augsburg.de/get/8tkquPq0Ee/ |
