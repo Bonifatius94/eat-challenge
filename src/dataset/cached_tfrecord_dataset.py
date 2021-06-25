@@ -108,6 +108,7 @@ def load_dataset(dataset_path: str, wildcard: str):
     # create a tfrecord dataset from file and extract features
     dataset = TFRecordDataset(tfrecord_filepath)
     dataset = dataset.map(lambda example: tf.io.parse_single_example(example, feature_description))
+    dataset = dataset.map(lambda x: (x[key_melspectrogram], x[key_label]))
     dataset = dataset.map(lambda x, y: (tf.squeeze(x, axis=0), y))
 
     return dataset
