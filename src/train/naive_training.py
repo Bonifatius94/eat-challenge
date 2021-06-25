@@ -19,13 +19,14 @@ class NaiveTrainingSession:
         self.params = params
 
         # load the training / test datasets and prepare the model to be trained
-        self.train_data = load_cached_tfrecord_datasets(params)
-        self.model = self.load_model(params)
+        self.dataset = load_cached_tfrecord_datasets(params, shuffle=False)
+        self.model = self.create_model(params)
 
         # create model checkpoint manager
         self.ckpt_dir = './trained_models/naive'
+        ckpt_path = self.ckpt_dir + "/naive-{epoch:04d}.ckpt"
         self.model_ckpt_callback = ModelCheckpoint(
-            filepath=self.ckpt_dir, save_weights_only=False,
+            filepath=ckpt_path, save_weights_only=False,
             monitor='val_accuracy', mode='max', save_best_only=True)
 
         # create tensorboard logger
@@ -33,7 +34,7 @@ class NaiveTrainingSession:
         self.tb_callback = TensorBoard(log_dir=logdir)
 
 
-    def load_model(self, params: dict):
+    def create_model(self, params: dict):
 
         # create the optimizer and loss function
         loss_func = SparseCategoricalCrossentropy()
@@ -49,15 +50,24 @@ class NaiveTrainingSession:
         return model
 
 
+    def load_best_model(self):
+
+        # load the best model from checkpoint cache
+        best_ckpt = tf.train.latest_checkpoint(self.ckpt_dir)
+        best_model = self.create_model(self.params)
+        best_model.load_weights(best_ckpt)
+        self.model = best_model
+
+
     def run_training(self):
 
         # split the dataset into train / eval / test portions (60/20/20)
         num_batches = int(np.ceil(self.params['num_train_samples'] / self.params['batch_size']))
         num_train_batches = int(num_batches * 0.6)
         num_eval_batches = int(num_batches * 0.2)
-        train_data = self.train_data.take(num_train_batches)
-        eval_data = self.train_data.skip(num_train_batches).take(num_eval_batches)
-        test_data = self.train_data.skip(num_train_batches + num_eval_batches)
+        train_data = self.dataset.take(num_train_batches).shuffle(20)
+        eval_data = self.dataset.skip(num_train_batches).take(num_eval_batches)
+        test_data = self.dataset.skip(num_train_batches + num_eval_batches)
 
         # evaluate the untrained model on the test dataset
         self.model.evaluate(x=test_data)
@@ -67,10 +77,6 @@ class NaiveTrainingSession:
                        validation_data=eval_data,
                        callbacks=[self.tb_callback, self.model_ckpt_callback])
 
-        # load the best model from checkpoint cache
-        ckpt = tf.train.Checkpoint(optimizer=Adam(), net=self.model)
-        ckpt_manager = tf.train.CheckpointManager(ckpt, self.ckpt_dir, max_to_keep=1)
-        ckpt.restore(ckpt_manager.latest_checkpoint).expect_partial()
-
         # evaluate the 'best' model checkpoint on the test dataset
+        self.load_best_model()
         self.model.evaluate(x=test_data)
