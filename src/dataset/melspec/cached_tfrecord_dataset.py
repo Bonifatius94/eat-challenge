@@ -108,7 +108,7 @@ def load_dataset(params: dict, dataset_path: str='./dataset', train: bool=True):
     wildcard = 'train' if train else 'test'
 
     # load dataset from tfrecord file
-    melspec_shape = params['melspec_shape']
+    melspec_shape = params['inputs_shape']
     sample_rate = params['sample_rate']
     tfrecord_file_wildcard = os.path.join(dataset_path, tfrecord_subdir,
         f'*{ wildcard }*{ sample_rate }*.tfrecord')
@@ -130,7 +130,7 @@ def load_dataset(params: dict, dataset_path: str='./dataset', train: bool=True):
     # create a tfrecord dataset from file and extract all features
     dataset = TFRecordDataset(tfrecord_filepath)
     dataset = dataset.map(lambda example: tf.io.parse_single_example(example, feature_description))
-    dataset = dataset.map(lambda x: (x[key_melspectrogram], x[key_label]))
+    dataset = dataset.map(lambda x: (x[key_melspectrogram], x[key_label if train else key_sample_id]))
     dataset = dataset.map(lambda x, y: (tf.squeeze(x, axis=0), y))
 
     return dataset

@@ -7,7 +7,7 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 
-from dataset import load_cached_tfrecord_datasets
+from dataset import DatasetFactory
 from model import NaiveEatModel
 
 
@@ -19,7 +19,7 @@ class NaiveTrainingSession:
         self.params = params
 
         # load the training / test datasets and prepare the model to be trained
-        self.dataset = load_cached_tfrecord_datasets(params, shuffle=False)
+        self.dataset = self.load_dataset(params)
         self.model = self.create_model(params)
 
         # create model checkpoint manager
@@ -35,6 +35,19 @@ class NaiveTrainingSession:
         self.tb_callback = TensorBoard(log_dir=logdir)
 
 
+    def load_dataset(self, params: dict):
+
+        # load the tfrecord melspec training dataset
+        factory = DatasetFactory()
+        dataset = factory.load_dataset(params['dataset_specifier'], params, train=True)
+
+        # batch the dataset properly and tune the performance by prefetching
+        dataset = dataset.batch(params['batch_size'])
+        dataset = dataset.prefetch(5)
+
+        return dataset
+
+
     def create_model(self, params: dict):
 
         # create the optimizer and loss function
@@ -46,8 +59,8 @@ class NaiveTrainingSession:
         model.compile(optimizer=optimizer, loss=loss_func, metrics=['accuracy'])
 
         # set the input data shape
-        melspec_shape = params['melspec_shape']
-        model.build((None, melspec_shape[0], melspec_shape[1], 1))
+        input_shape = [None] + params['inputs_shape']
+        model.build(input_shape)
 
         return model
 
