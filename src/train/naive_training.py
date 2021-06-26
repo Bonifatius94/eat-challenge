@@ -74,13 +74,16 @@ class NaiveTrainingSession:
         eval_data = self.dataset.skip(num_train_batches).take(num_eval_batches)
         test_data = self.dataset.skip(num_train_batches + num_eval_batches)
 
-        # evaluate the untrained model on the test dataset
-        self.model.evaluate(x=test_data)
+        # check if training should be skipped
+        if not self.params['skip_training']:
 
-        # do the training by fitting the model to the training dataset
-        self.model.fit(x=train_data, epochs=self.params['num_epochs'],
-                       validation_data=eval_data,
-                       callbacks=[self.tb_callback, self.model_ckpt_callback])
+            # evaluate the untrained model on the test dataset
+            self.model.evaluate(x=test_data)
+
+            # do the training by fitting the model to the training dataset
+            self.model.fit(x=train_data, epochs=self.params['num_epochs'],
+                        validation_data=eval_data,
+                        callbacks=[self.tb_callback, self.model_ckpt_callback])
 
         # evaluate the 'best' model checkpoint on the test dataset
         self.load_best_model()
