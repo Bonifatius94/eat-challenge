@@ -24,7 +24,8 @@ class NaiveTrainingSession:
 
         # create model checkpoint manager
         self.ckpt_dir = './trained_models/naive'
-        ckpt_path = self.ckpt_dir + "/naive-{epoch:04d}.ckpt"
+        ckpt_path = self.ckpt_dir + "/naive.ckpt"
+        # ckpt_path = self.ckpt_dir + "/naive-{epoch:04d}.ckpt"
         self.model_ckpt_callback = ModelCheckpoint(
             filepath=ckpt_path, save_weights_only=False,
             monitor='val_accuracy', mode='max', save_best_only=True)
@@ -44,6 +45,7 @@ class NaiveTrainingSession:
         model = NaiveEatModel(params['num_classes'])
         model.compile(optimizer=optimizer, loss=loss_func, metrics=['accuracy'])
 
+        # set the input data shape
         melspec_shape = params['melspec_shape']
         model.build((None, melspec_shape[0], melspec_shape[1], 1))
 
@@ -60,6 +62,9 @@ class NaiveTrainingSession:
 
 
     def run_training(self):
+
+        # print a summary of the model layers to be trained
+        print(self.model.summary())
 
         # split the dataset into train / eval / test portions (60/20/20)
         num_batches = int(np.ceil(self.params['num_train_samples'] / self.params['batch_size']))
