@@ -37,7 +37,7 @@ def run_naive_training():
     # define hyper-params required for creating the training session
     params = {
         # training hparams
-        'num_epochs': 20,
+        'num_epochs': 10,
         'batch_size': 16, # batch size seems to be very volatile
 
         # dataset hparams
