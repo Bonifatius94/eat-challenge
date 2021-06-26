@@ -1,1 +1,2 @@
 from .naive_training import NaiveTrainingSession
+from .noisy_training import NoisyTrainingSession

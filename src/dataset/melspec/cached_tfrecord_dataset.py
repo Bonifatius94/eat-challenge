@@ -73,7 +73,7 @@ _bytes_feature = lambda values: Feature(bytes_list=BytesList(value=values))
 
 def serialize_train_example(melspectrogram: np.ndarray, label: int):
 
-    tf.print(f'melspec shape: { melspectrogram.shape }')
+    # tf.print(f'melspec shape: { melspectrogram.shape }')
 
     # create an example with the given features
     example_proto = Example(features=Features(feature={
