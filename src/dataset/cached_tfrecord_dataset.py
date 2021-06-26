@@ -73,7 +73,7 @@ _int64_feature = lambda values: Feature(int64_list=Int64List(value=values))
 
 def serialize_example(melspectrogram: np.ndarray, label: int):
 
-    tf.print(f'melspec shape: { melspectrogram.shape }')
+    # tf.print(f'melspec shape: { melspectrogram.shape }')
 
     # create an example with the given features
     example_proto = Example(features=Features(feature={

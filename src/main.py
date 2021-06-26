@@ -1,6 +1,6 @@
 
 import sys
-from train import NaiveTrainingSession
+from train import NaiveTrainingSession, NoisyTrainingSession
 from dataset import write_tfrecord_datasets
 
 
@@ -16,16 +16,17 @@ def main():
     # run the task
     if task == 'preprocess_dataset': preprocess_dataset()
     if task == 'naive_training': run_naive_training()
+    if task == 'noisy_training': run_noisy_training()
     # TODO: add more tasks here ...
 
 
 def preprocess_dataset():
 
     # define hyper-params required for preprocessing the dataset
-    params =  {
+    params = {
         'seconds_per_sample': 4,
         'sample_rate': 48000,
-        'num_map_threads': 3,
+        'num_map_threads': 16,
     }
 
     # write a tfrecord cache file for each dataset (train / test)
@@ -39,7 +40,7 @@ def run_naive_training():
         # training hparams
         'skip_training': False,
         'num_epochs': 10,
-        'batch_size': 16, # batch size seems to be very volatile
+        'batch_size': 16,  # batch size seems to be very volatile
 
         # dataset hparams
         'num_train_samples': 945,
@@ -55,6 +56,33 @@ def run_naive_training():
 
     # load a dataset for testing purposes
     session = NaiveTrainingSession(params)
+    session.run_training()
+
+
+
+def run_noisy_training():
+
+    # define hyper-params required for creating the training session
+    params = {
+        # training hparams
+        'skip_training': False,
+        'num_epochs': 10,
+        'batch_size': 16,  # batch size seems to be very volatile
+
+        # dataset hparams
+        'num_train_samples': 945,
+        'num_test_samples': 469,
+        'seconds_per_sample': 4,
+        # 'sample_rate': 48000,
+        'sample_rate': 16000,
+        'num_map_threads': 3,
+        'num_classes': 7,
+        # 'melspec_shape': (128, 376, 1),
+        'melspec_shape': (128, 126, 1),
+    }
+
+    # load a dataset for testing purposes
+    session = NoisyTrainingSession(params)
     session.run_training()
 
 
