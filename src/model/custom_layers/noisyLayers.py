@@ -56,7 +56,7 @@ class NoisyDense(Dense):
         w = self.kernel + tf.multiply(self.kernel_sigma, self.kernel_epsilon)
 
         # apply the kernel to the inputs like in a common dense layer
-        output = tf.keras.dot(inputs, w)
+        output = tf.tensordot(inputs, w, axes=1)
 
         # process the bias (if exists)
         if self.use_bias:
