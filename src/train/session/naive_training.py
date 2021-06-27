@@ -8,6 +8,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 
 from dataset import DatasetFactory
+from dataset.core import partition_dataset
 from model import NaiveEatModel
 
 
@@ -18,11 +19,13 @@ class NaiveTrainingSession:
 
         self.params = params
 
-        # load the training / test datasets and prepare the model to be trained
-        self.dataset = self.load_dataset(params)
+        # load the train / eval / test datasets
+        self.train_data, self.eval_data, self.test_data = self.load_dataset(params)
+
+        # prepare the model to be trained
         self.model = self.create_model(params)
 
-        # create model checkpoint manager
+        # create the model checkpoint manager
         self.ckpt_dir = './trained_models/naive'
         ckpt_path = self.ckpt_dir + "/naive.ckpt"
         # ckpt_path = self.ckpt_dir + "/naive-{epoch:04d}.ckpt"
@@ -30,7 +33,7 @@ class NaiveTrainingSession:
             filepath=ckpt_path, save_weights_only=False,
             monitor='val_accuracy', mode='max', save_best_only=True)
 
-        # create tensorboard logger
+        # create the tensorboard logger
         logdir = './logs/naive/naive' + datetime.now().strftime("%Y%m%d-%H%M%S")
         self.tb_callback = TensorBoard(log_dir=logdir)
 
@@ -45,7 +48,8 @@ class NaiveTrainingSession:
         dataset = dataset.batch(params['batch_size'])
         dataset = dataset.prefetch(5)
 
-        return dataset
+        # partition the dataset into train / eval / test splits
+        return partition_dataset(dataset, params['dataset_splits'], params['batch_size'])
 
 
     def create_model(self, params: dict):
@@ -79,25 +83,17 @@ class NaiveTrainingSession:
         # print a summary of the model layers to be trained
         print(self.model.summary())
 
-        # split the dataset into train / eval / test portions (60/20/20)
-        num_batches = int(np.ceil(self.params['num_train_samples'] / self.params['batch_size']))
-        num_train_batches = int(num_batches * 0.6)
-        num_eval_batches = int(num_batches * 0.2)
-        train_data = self.dataset.take(num_train_batches).shuffle(20)
-        eval_data = self.dataset.skip(num_train_batches).take(num_eval_batches)
-        test_data = self.dataset.skip(num_train_batches + num_eval_batches)
-
         # check if training should be skipped
         if not self.params['skip_training']:
 
             # evaluate the untrained model on the test dataset
-            self.model.evaluate(x=test_data)
+            self.model.evaluate(x=self.test_data)
 
             # do the training by fitting the model to the training dataset
-            self.model.fit(x=train_data, epochs=self.params['num_epochs'],
-                        validation_data=eval_data,
-                        callbacks=[self.tb_callback, self.model_ckpt_callback])
+            self.model.fit(x=self.train_data, epochs=self.params['num_epochs'],
+                           validation_data=self.eval_data,
+                           callbacks=[self.tb_callback, self.model_ckpt_callback])
 
         # evaluate the 'best' model checkpoint on the test dataset
         self.load_best_model()
-        self.model.evaluate(x=test_data)
+        self.model.evaluate(x=self.test_data)

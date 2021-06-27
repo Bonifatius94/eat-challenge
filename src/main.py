@@ -31,7 +31,7 @@ def preprocess_dataset(train_type: str):
 
     # create a preprocessed melspec dataset (TFRecord) from raw audio data
     factory = DatasetFactory()
-    factory.create_cached_dataset(train_params)
+    factory.create_cached_dataset(train_params['dataset_specifier'], train_params)
 
 
 def run_training(train_type: str):
