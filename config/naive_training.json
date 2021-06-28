@@ -8,6 +8,7 @@
     "num_test_samples": 469,
     "num_classes": 7,
     "inputs_shape": [128, 126, 1],
+    "dataset_splits": [0.6, 0.2, 0.2],
 
     "seconds_per_sample": 4,
     "sample_rate": 16000,

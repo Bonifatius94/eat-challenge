@@ -49,7 +49,7 @@ class NaiveTrainingSession:
         dataset = dataset.prefetch(5)
 
         # partition the dataset into train / eval / test splits
-        return partition_dataset(dataset, params['dataset_splits'], params['batch_size'])
+        return partition_dataset(dataset, params['dataset_splits'])
 
 
     def create_model(self, params: dict):
