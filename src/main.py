@@ -22,7 +22,6 @@ def main():
     elif task == 'run_training': run_training(train_type)
     elif task == 'eval_results': eval_results(train_type)
     else: raise ValueError(f'Unknown main task { task }!')
-    # TODO: add more tasks here ...
 
 
 def preprocess_dataset(train_type: str):
