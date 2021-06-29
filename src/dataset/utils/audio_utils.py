@@ -32,13 +32,13 @@ def load_audio_file_overlapping(audio_filepath: str,
 
     # load the wave file in waveform
     raw_audio, _ = librosa.load(audio_filepath, sr=sample_rate)
-    sampled_steps = raw_audio.shape[0]
+    sample_steps = raw_audio.shape[0]
 
     step = 0
     audio_shards = []
 
     # loop until the last shard is reached
-    while step <= sampled_steps - shard_steps:
+    while step <= sample_steps - shard_steps:
 
         # cut the next audio shard
         shard = raw_audio[step:(step+shard_steps)]
@@ -46,10 +46,12 @@ def load_audio_file_overlapping(audio_filepath: str,
         step += overlap_steps
 
     # collect the last shard (padded with trailing zeros)
-    if step < sampled_steps:
-        diff = shard_steps - (sampled_steps - step)
+    # ensure to always sample at least 1 shard, filter too small shards
+    if not (step > 0 and sample_steps - step < 0.5 * shard_steps):
+        diff = shard_steps - (sample_steps - step)
         padding = np.zeros(diff, dtype = np.int16)
-        raw_audio = np.concatenate((raw_audio[step:-1], padding))
+        last_shard = np.concatenate((raw_audio[step:], padding))
+        audio_shards.append(last_shard)
 
     # convert all shards into logarithmized melspectrograms
     melspec_shards = []
@@ -61,4 +63,6 @@ def load_audio_file_overlapping(audio_filepath: str,
         shard = np.expand_dims(shard, axis=-1)
         melspec_shards.append(shard)
 
-    return melspec_shards
+    print('num_shards', len(melspec_shards))
+
+    return np.array(melspec_shards)

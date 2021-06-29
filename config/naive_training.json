@@ -1,16 +1,15 @@
 {
     "skip_training": false,
-    "num_epochs": 10,
+    "num_epochs": 20,
     "batch_size": 16,
-    "dataset_specifier": "tfrecord_melspec",
-
-    "num_train_samples": 945,
-    "num_test_samples": 469,
     "num_classes": 7,
+
+    "dataset_specifier": "tfrecord_melspec",
     "inputs_shape": [128, 126, 1],
     "dataset_splits": [0.6, 0.2, 0.2],
 
-    "seconds_per_sample": 4,
+    "seconds_shard": 4,
+    "seconds_overlap": 2,
     "sample_rate": 16000,
     "num_map_threads": 3
 }

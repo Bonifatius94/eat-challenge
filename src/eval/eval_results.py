@@ -31,6 +31,7 @@ class EvalSession:
             # unpack the batch and predict on it
             inputs, ids = batch
             preds = tf.argmax(self.model(inputs), axis=1)
+            # TODO: handle the prediction of multiple audio shards
 
             # preprocess preds and sample ids for export
             preds = np.array([id2type[id] for id in preds.numpy()])
