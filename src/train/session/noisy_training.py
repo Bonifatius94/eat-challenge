@@ -16,6 +16,8 @@ class NoisyTrainingSession:
     def __init__(self, params: dict):
         super(NoisyTrainingSession, self).__init__()
 
+        # TODO: rework training to fit the new config file parameters
+
         self.params = params
 
         # load the training / test datasets and prepare the model to be trained
