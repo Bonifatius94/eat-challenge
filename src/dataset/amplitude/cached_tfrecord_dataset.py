@@ -19,7 +19,7 @@ from .mapped_dataset import load_dataset as load_mapped_dataset
 tfrecord_subdir = 'tfrecord'
 
 # define the feature keys of each data example in the tfrecord file
-key_melspectrogram = 'melspectrogram'
+key_melspectrogram = 'amplitude'
 key_label = 'label'
 key_sample_id = 'sample_id'
 
@@ -40,7 +40,7 @@ def write_tfrecord_dataset(params: dict, dataset_path: str='./dataset', train: b
     # determine the target filepath of the tfrecord file
     sample_rate = params['sample_rate']
     tfrecord_filepath = os.path.join(dataset_path, tfrecord_subdir,
-        f'{ wildcard }-melspec-{ sample_rate }.tfrecord')
+        f'{ wildcard }-amplitude-{ sample_rate }.tfrecord')
 
     # use the mapped dataset utils to load all features to be exported
     # info: the mapped dataset is preferred as it facilitates CPU scaling
@@ -73,7 +73,7 @@ _bytes_feature = lambda values: Feature(bytes_list=BytesList(value=values))
 
 def serialize_train_example(melspectrogram: np.ndarray, label: int):
 
-    # tf.print(f'melspec shape: { melspectrogram.shape }')
+    tf.print(f'melspec shape: { melspectrogram.shape }')
 
     # create an example with the given features
     example_proto = Example(features=Features(feature={
@@ -111,7 +111,7 @@ def load_dataset(params: dict, dataset_path: str='./dataset', train: bool=True):
     melspec_shape = params['inputs_shape']
     sample_rate = params['sample_rate']
     tfrecord_file_wildcard = os.path.join(dataset_path, tfrecord_subdir,
-        f'*{ wildcard }*melspec*{ sample_rate }*.tfrecord')
+        f'*{ wildcard }*amplitude*{ sample_rate }*.tfrecord')
     tfrecord_filepath = glob.glob(tfrecord_file_wildcard)[0]
 
     # define the tfrecord dataset features to be parsed

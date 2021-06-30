@@ -1,2 +1,3 @@
-from .audio_utils import load_audio_file, load_audio_file_overlapping
+from .audio_utils import load_audio_file_as_melspec, load_audio_file_as_overlapping_melspec
+from .audio_utils import load_audio_file_as_amplitude, load_audio_file_as_overlapping_amplitude
 from .label_utils import load_labels, get_label_dicts

@@ -2,7 +2,7 @@
 import numpy as np
 import tensorflow as tf
 
-from dataset.utils import load_audio_file_as_melspec, load_audio_file_as_overlapping_melspec
+from dataset.utils import load_audio_file_as_amplitude, load_audio_file_as_overlapping_amplitude
 from dataset.core import load_labeled_audio_filepaths_dataset
 
 
@@ -42,7 +42,7 @@ def audio_preprocessing_func(params: dict):
     target_steps = params['seconds_shard'] * params['sample_rate']
 
     # define a mapping functions for audio proprocessing
-    tf_load_audio_file = lambda file, sr, steps: load_audio_file_as_melspec(file.numpy(), sr, steps)
+    tf_load_audio_file = lambda file, sr, steps: load_audio_file_as_amplitude(file.numpy(), sr, steps)
     pyfunc_load_audio = lambda file: \
         tf.py_function(tf_load_audio_file, [file, sample_rate, target_steps], [tf.float32])
 
@@ -57,7 +57,7 @@ def overlapping_audio_preprocessing_func(params: dict):
     overlap_steps = params['seconds_overlap'] * params['sample_rate']
 
     # define a mapping functions for audio proprocessing
-    tf_load_audio_file = lambda file: load_audio_file_as_overlapping_melspec(
+    tf_load_audio_file = lambda file: load_audio_file_as_overlapping_amplitude(
         file.numpy(), sample_rate, shard_steps, overlap_steps)
     pyfunc_load_audio = lambda file: tf.py_function(tf_load_audio_file, [file], [tf.float32])
 
