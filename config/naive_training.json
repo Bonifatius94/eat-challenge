@@ -5,11 +5,11 @@
     "num_classes": 7,
 
     "dataset_specifier": "tfrecord_melspec",
-    "inputs_shape": [128, 126, 1],
+    "inputs_shape": [128, 128, 1],
     "dataset_splits": [0.6, 0.2, 0.2],
 
     "seconds_shard": 4,
     "seconds_overlap": 2,
-    "sample_rate": 16000,
+    "sample_rate": 16256,
     "num_map_threads": 3
 }
