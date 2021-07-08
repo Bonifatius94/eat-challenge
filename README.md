@@ -19,14 +19,14 @@ First, cache the input dataset as TFRecord files for a training session (e.g. na
 This should massively improve your training performance.
 
 ```sh
-# cache the melspectrograms dataset as TFRecord file
+# cache the preprocessed audio dataset as TFRecord file
 python src/main.py preprocess_dataset naive
 ```
 
 Now, you can launch a training session (e.g. naive training).
 
 ```sh
-# process a naive training session
+# process a training session
 python src/main.py run_training naive
 ```
 
@@ -34,7 +34,7 @@ After that you can sample all inputs of the unknown test dataset using a trained
 and export the prediction results for EAT challenge submission.
 
 ```sh
-# evaluate trained model results for submission
+# evaluate the results for submission
 python src/main.py eval_results naive
 ```
 
