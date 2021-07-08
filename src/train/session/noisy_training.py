@@ -25,15 +25,15 @@ class NoisyTrainingSession:
         self.model = self.create_model(params)
 
         # create model checkpoint manager
-        self.ckpt_dir = './trained_models/naive'
-        ckpt_path = self.ckpt_dir + "/naive.ckpt"
-        # ckpt_path = self.ckpt_dir + "/naive-{epoch:04d}.ckpt"
+        self.ckpt_dir = './trained_models/noisy'
+        ckpt_path = self.ckpt_dir + "/noisy.ckpt"
+        # ckpt_path = self.ckpt_dir + "/noisy-{epoch:04d}.ckpt"
         self.model_ckpt_callback = ModelCheckpoint(
             filepath=ckpt_path, save_weights_only=False,
             monitor='val_accuracy', mode='max', save_best_only=True)
 
         # create tensorboard logger
-        logdir = './logs/naive/naive' + datetime.now().strftime("%Y%m%d-%H%M%S")
+        logdir = './logs/noisy/noisy' + datetime.now().strftime("%Y%m%d-%H%M%S")
         self.tb_callback = TensorBoard(log_dir=logdir)
 
 
