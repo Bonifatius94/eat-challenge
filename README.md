@@ -38,6 +38,14 @@ and export the prediction results for EAT challenge submission.
 python src/main.py eval_results naive
 ```
 
+Valid training configurations are:
+- naive
+- noisy
+- autoenc
+- amplitude
+
+Remark: Use a GPU empowered machine for amplitude training (although it won't be too rewarding anyways)
+
 ## Training Results
 
 | Training  | Approach Description                                     | Test Acc. | Real Acc. |
