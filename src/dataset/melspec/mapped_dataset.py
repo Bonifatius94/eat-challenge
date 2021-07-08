@@ -17,7 +17,8 @@ def load_dataset(params: dict, dataset_path: str='./dataset', train: bool=True):
     dataset = load_labeled_audio_filepaths_dataset(dataset_path, train)
 
     # define the function for loading and preprocessing audio files
-    file2audio = overlapping_audio_preprocessing_func(params)
+    file2audio = overlapping_audio_preprocessing_func(params) \
+        if params['multi_shard'] else audio_preprocessing_func(params)
 
     # map the audio file paths to preprocessed audio features
     # info: there can be multiple audio shards per file (-> one-to-many)
@@ -27,10 +28,11 @@ def load_dataset(params: dict, dataset_path: str='./dataset', train: bool=True):
         deterministic=True # ensure deterministic datasets
     )
 
-    # dataset = dataset.map(lambda x, y: (x[0][0], y))
-    dataset = dataset.flat_map(lambda x, y: 
-        tf.data.Dataset.range(tf.shape(x, out_type=tf.int64)[1], out_type=tf.int64)
-            .map(lambda i: (x[0][i], y)))
+    # flat map multiple shards accordingly
+    if params['multi_shard']:
+        dataset = dataset.flat_map(lambda x, y: 
+            tf.data.Dataset.range(tf.shape(x, out_type=tf.int64)[1], out_type=tf.int64)
+                .map(lambda i: (x[0][i], y)))
 
     return dataset
 

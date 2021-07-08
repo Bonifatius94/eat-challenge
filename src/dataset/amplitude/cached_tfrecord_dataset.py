@@ -19,7 +19,7 @@ from .mapped_dataset import load_dataset as load_mapped_dataset
 tfrecord_subdir = 'tfrecord'
 
 # define the feature keys of each data example in the tfrecord file
-key_melspectrogram = 'amplitude'
+key_amplitude = 'amplitude'
 key_label = 'label'
 key_sample_id = 'sample_id'
 
@@ -77,7 +77,7 @@ def serialize_train_example(melspectrogram: np.ndarray, label: int):
 
     # create an example with the given features
     example_proto = Example(features=Features(feature={
-        key_melspectrogram: _float_feature(melspectrogram.flatten()),
+        key_amplitude: _float_feature(melspectrogram.flatten()),
         key_label: _int64_feature(label),
     }))
 
@@ -91,7 +91,7 @@ def serialize_test_example(melspectrogram: np.ndarray, sample_id: str):
 
     # create an example with the given features
     example_proto = Example(features=Features(feature={
-        key_melspectrogram: _float_feature(melspectrogram.flatten()),
+        key_amplitude: _float_feature(melspectrogram.flatten()),
         key_sample_id: _bytes_feature(sample_id),
     }))
 
@@ -116,12 +116,12 @@ def load_dataset(params: dict, dataset_path: str='./dataset', train: bool=True):
 
     # define the tfrecord dataset features to be parsed
     train_feature_description = {
-        key_melspectrogram: FixedLenSequenceFeature(shape=melspec_shape, dtype=tf.float32,
+        key_amplitude: FixedLenSequenceFeature(shape=melspec_shape, dtype=tf.float32,
                                                     default_value=0.0, allow_missing=True),
         key_label: FixedLenFeature(shape=[], dtype=tf.int64, default_value=0)
     }
     test_feature_description = {
-        key_melspectrogram: FixedLenSequenceFeature(shape=melspec_shape, dtype=tf.float32,
+        key_amplitude: FixedLenSequenceFeature(shape=melspec_shape, dtype=tf.float32,
                                                     default_value=0.0, allow_missing=True),
         key_sample_id: FixedLenFeature(shape=[], dtype=tf.string, default_value='')
     }
@@ -130,7 +130,7 @@ def load_dataset(params: dict, dataset_path: str='./dataset', train: bool=True):
     # create a tfrecord dataset from file and extract all features
     dataset = TFRecordDataset(tfrecord_filepath)
     dataset = dataset.map(lambda example: tf.io.parse_single_example(example, feature_description))
-    dataset = dataset.map(lambda x: (x[key_melspectrogram], x[key_label if train else key_sample_id]))
+    dataset = dataset.map(lambda x: (x[key_amplitude], x[key_label if train else key_sample_id]))
     dataset = dataset.map(lambda x, y: (tf.squeeze(x, axis=0), y))
 
     return dataset
