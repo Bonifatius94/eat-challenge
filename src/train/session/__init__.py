@@ -1,2 +1,4 @@
+from .amplitude_training import AmplitudeTrainingSession
+from .autoenc_training import AutoEncTrainingSession
 from .naive_training import NaiveTrainingSession
 from .noisy_training import NoisyTrainingSession
