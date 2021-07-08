@@ -1,7 +1,6 @@
 
 from datetime import datetime
 from matplotlib import pyplot as plt
-import numpy as np
 import tensorflow as tf
 
 from tensorflow.keras.losses import SparseCategoricalCrossentropy, MSE
@@ -23,7 +22,7 @@ class AutoEncTrainingSession:
         # load the train / eval / test datasets
         self.train_data, self.eval_data, self.test_data = self.load_dataset(params)
 
-        # prepare the model to be trained
+        # prepare the models to be trained
         self.autoenc_model, self.model = self.create_model(params)
 
         # create the model checkpoint manager
@@ -109,25 +108,19 @@ class AutoEncTrainingSession:
             self.autoenc_model.fit(x=autoenc_train_data, epochs=self.params['num_autoenc_epochs'],
                            validation_data=autoenc_eval_data, callbacks=[self.autoenc_tb_callback])
 
-            self.print_auto_enc_samples()
+            # sample some melspec reconstructions
+            # self.print_auto_enc_samples()
 
+            # train the classifier on the training dataset split (freezed encoder)
             self.model.nn_encoder.trainable = False
-
-            # train the classifier on the training dataset split
-            self.model.fit(x=self.train_data, epochs=int(self.params['num_epochs']/2),
+            self.model.fit(x=self.train_data, epochs=int(self.params['num_epochs']),
                            validation_data=self.eval_data,
                            callbacks=[self.tb_callback, self.model_ckpt_callback])
 
-            self.model.nn_encoder.trainable = True
-
-            # train the classifier on the training dataset split
-            self.model.fit(x=self.train_data, epochs=self.params['num_epochs'],
-                           validation_data=self.eval_data,
-                           callbacks=[self.tb_callback, self.model_ckpt_callback])
-
-    # evaluate the 'best' model checkpoint on the test dataset
+        # evaluate the 'best' model checkpoint on the test dataset
         self.load_best_model()
         self.model.evaluate(x=self.test_data)
+
 
     def print_auto_enc_samples(self):
         n_examples = 6

@@ -7,9 +7,10 @@
     "num_train_samples": 945,
     "num_test_samples": 469,
     "num_classes": 7,
-    "inputs_shape": [128, 126, 1],
+    "inputs_shape": [128, 128, 1],
 
-    "seconds_per_sample": 4,
-    "sample_rate": 16000,
+    "multi_shard": false,
+    "seconds_per_shard": 4,
+    "sample_rate": 16256,
     "num_map_threads": 3
 }

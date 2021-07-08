@@ -10,6 +10,8 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from dataset import DatasetFactory
 from dataset.core import partition_dataset
 from model import AmplitudeEatModel
+from model.custom_callbacks import SaveBestAccuracyCallback
+
 
 
 class AmplitudeTrainingSession:
@@ -26,12 +28,14 @@ class AmplitudeTrainingSession:
         self.model = self.create_model(params)
 
         # create the model checkpoint manager
-        self.ckpt_dir = './trained_models/amplitude'
+        self.ckpt_dir = 'C:/Users/benny/Documents/SoSe21/DeepL/ubung/deepl-eat-challenge/trained_models/amplitude'
         ckpt_path = self.ckpt_dir + "/amplitude.ckpt"
         # ckpt_path = self.ckpt_dir + "/amplitude-{epoch:04d}.ckpt"
         self.model_ckpt_callback = ModelCheckpoint(
             filepath=ckpt_path, save_weights_only=False,
             monitor='val_accuracy', mode='max', save_best_only=True)
+
+        self.custom_callback = SaveBestAccuracyCallback(ckpt_path, self.model)
 
         # create the tensorboard logger
         logdir = './logs/amplitude/amplitude' + datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -95,7 +99,7 @@ class AmplitudeTrainingSession:
             # do the training by fitting the model to the training dataset
             self.model.fit(x=self.train_data, epochs=self.params['num_epochs'],
                            validation_data=self.eval_data,
-                           callbacks=[self.tb_callback, self.model_ckpt_callback])
+                           callbacks=[self.tb_callback, self.custom_callback])  # self.model_ckpt_callback,
 
         # evaluate the 'best' model checkpoint on the test dataset
         self.load_best_model()
