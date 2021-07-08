@@ -1,6 +1,6 @@
 {
     "skip_training": false,
-    "num_epochs": 20,
+    "num_epochs": 50,
     "batch_size": 16,
     "num_classes": 7,
 
@@ -8,6 +8,7 @@
     "inputs_shape": [128, 128, 1],
     "dataset_splits": [0.6, 0.2, 0.2],
 
+    "multi_shard": false,
     "seconds_shard": 4,
     "seconds_overlap": 2,
     "sample_rate": 16256,
