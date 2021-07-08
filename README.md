@@ -50,7 +50,9 @@ Valid training configurations are:
 - autoenc
 - amplitude
 
-Remark: Use a GPU empowered machine for amplitude training (although it won't be too rewarding anyways)
+Remark: Use a GPU empowered machine for amplitude training (although it won't be too rewarding anyways).
+        Tested on Ubuntu 20.04. For running on Windows, the keras ModelCheckpoint Callback has to be switched to
+        our SaveBestAccuracyCallback.
 
 ## Training Results
 
@@ -59,4 +61,4 @@ Remark: Use a GPU empowered machine for amplitude training (although it won't be
 | Naive     | Train on audio melspectrograms using Conv2D              |      0.41 |      ?.?? |
 | Noisy     | Train on audio melspectrograms using custom noisy Conv2D |      0.44 |      ?.?? |
 | Amplitude | Train on audio amplitude using Conv1D                    |      0.23 |      ?.?? |
-| AutoEnc   | Train on audio melspectrograms using an Auto Encoder     |      0.30 |      ?.?? |
+| AutoEnc   | Train on audio melspectrograms using an Auto Encoder     |      0.25 |      ?.?? |
