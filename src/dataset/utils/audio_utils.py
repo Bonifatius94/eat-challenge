@@ -44,6 +44,7 @@ def load_audio_file_as_overlapping_melspec(audio_filepath: str,
         shard = raw_audio[step:(step+shard_steps)]
         audio_shards.append(shard)
         step += (shard_steps - overlap_steps)
+        # TODO: cut trailing seconds (there is no content oftentimes)
 
     # collect the last shard (padded with trailing zeros)
     # ensure to always sample at least 1 shard, filter too small shards
