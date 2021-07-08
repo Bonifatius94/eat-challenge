@@ -1,9 +1,10 @@
 {
     "skip_training": false,
-    "num_epochs": 20,
-    "num_autoenc_epochs": 10,
+    "num_epochs": 100,
+    "num_autoenc_epochs": 100,
     "batch_size": 16,
     "num_classes": 7,
+    "encoder_out_channels": 4,
 
     "dataset_specifier": "tfrecord_melspec",
     "inputs_shape": [128, 128, 1],
@@ -12,5 +13,5 @@
     "seconds_shard": 4,
     "seconds_overlap": 2,
     "sample_rate": 16256,
-    "num_map_threads": 3
+    "num_map_threads": 32
 }
