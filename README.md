@@ -40,6 +40,9 @@ python src/main.py eval_results naive
 
 ## Training Results
 
-| Training | Approach Description                        | Test Acc. | Trained Weights                                   | Logs                                              |
-| -------- | ------------------------------------------- | --------- | ------------------------------------------------- | ------------------------------------------------- |
-| Naive    | Train on audio melspectrograms using Conv2D |      0.40 | TODO: upload weights | TODO: upload logs |
+| Training  | Approach Description                                     | Test Acc. | Real Acc. |
+| --------- | -------------------------------------------------------- | --------- | --------- |
+| Naive     | Train on audio melspectrograms using Conv2D              |      0.41 |      ?.?? |
+| Noisy     | Train on audio melspectrograms using custom noisy Conv2D |      0.44 |      ?.?? |
+| Amplitude | Train on audio amplitude using Conv1D                    |      0.23 |      ?.?? |
+| AutoEnc   | Train on audio melspectrograms using an Auto Encoder     |      0.40 |      ?.?? |
