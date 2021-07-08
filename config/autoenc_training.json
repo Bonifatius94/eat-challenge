@@ -1,6 +1,6 @@
 {
     "skip_training": false,
-    "num_epochs": 100,
+    "num_epochs": 50,
     "num_autoenc_epochs": 100,
     "batch_size": 16,
     "num_classes": 7,

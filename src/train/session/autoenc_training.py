@@ -109,17 +109,11 @@ class AutoEncTrainingSession:
                            validation_data=autoenc_eval_data, callbacks=[self.autoenc_tb_callback])
 
             # sample some melspec reconstructions
-            self.print_auto_enc_samples()
+            # self.print_auto_enc_samples()
 
             # train the classifier on the training dataset split (freezed encoder)
             self.model.nn_encoder.trainable = False
-            self.model.fit(x=self.train_data, epochs=int(self.params['num_epochs']/2),
-                           validation_data=self.eval_data,
-                           callbacks=[self.tb_callback, self.model_ckpt_callback])
-
-            # train the classifier on the training dataset split (unfreezed encoder)
-            self.model.nn_encoder.trainable = True
-            self.model.fit(x=self.train_data, epochs=self.params['num_epochs'],
+            self.model.fit(x=self.train_data, epochs=int(self.params['num_epochs']),
                            validation_data=self.eval_data,
                            callbacks=[self.tb_callback, self.model_ckpt_callback])
 
