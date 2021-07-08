@@ -1,5 +1,6 @@
 
 from datetime import datetime
+from matplotlib import pyplot as plt
 import numpy as np
 import tensorflow as tf
 
@@ -64,14 +65,15 @@ class AutoEncTrainingSession:
         classif_optimizer = Adam()
 
         # prepare the model for training
-        autoenc_model = AutoEncEatModel()
+        autoenc_model = AutoEncEatModel(out_channels=params['encoder_out_channels'])
         autoenc_model.compile(optimizer=autoenc_optimizer, loss=MSE)
 
         # prepare the model for training
         classif_model = AutoEncClassifModel(encoder=autoenc_model.nn_encoder,
             num_classes=params['num_classes'])
-        classif_model.compile(optimizer=classif_optimizer, \
-            loss=SparseCategoricalCrossentropy(), metrics=['accuracy'])
+        classif_model.compile(optimizer=classif_optimizer,
+                              loss=SparseCategoricalCrossentropy(),
+                              metrics=['accuracy'])
 
         # set the input data shape
         input_shape = [None] + params['inputs_shape']
@@ -107,11 +109,33 @@ class AutoEncTrainingSession:
             self.autoenc_model.fit(x=autoenc_train_data, epochs=self.params['num_autoenc_epochs'],
                            validation_data=autoenc_eval_data, callbacks=[self.autoenc_tb_callback])
 
+            self.print_auto_enc_samples()
+
+            self.model.nn_encoder.trainable = False
+
+            # train the classifier on the training dataset split
+            self.model.fit(x=self.train_data, epochs=int(self.params['num_epochs']/2),
+                           validation_data=self.eval_data,
+                           callbacks=[self.tb_callback, self.model_ckpt_callback])
+
+            self.model.nn_encoder.trainable = True
+
             # train the classifier on the training dataset split
             self.model.fit(x=self.train_data, epochs=self.params['num_epochs'],
                            validation_data=self.eval_data,
                            callbacks=[self.tb_callback, self.model_ckpt_callback])
 
-        # evaluate the 'best' model checkpoint on the test dataset
+    # evaluate the 'best' model checkpoint on the test dataset
         self.load_best_model()
         self.model.evaluate(x=self.test_data)
+
+    def print_auto_enc_samples(self):
+        n_examples = 6
+        examples, _ = iter(self.eval_data).next()
+        predictions = self.autoenc_model.predict(examples)
+        fig, axes = plt.subplots(nrows=n_examples, ncols=2, figsize=(15, 30))
+
+        for i in range(n_examples):
+            axes[i][0].imshow(examples[i])
+            axes[i][1].imshow(predictions[i])
+        plt.show()
