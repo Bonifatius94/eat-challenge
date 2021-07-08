@@ -12,6 +12,22 @@ from dataset.core import partition_dataset
 from model import AmplitudeEatModel
 
 
+class CustomCallback(tf.keras.callbacks.Callback):
+
+    def __init__(self, cpt_path: str, model_to_save: AmplitudeEatModel):
+        super(CustomCallback, self).__init__()
+        self.best_accuracy = 0
+        self.model_to_save = model_to_save
+        self.cpt_path = cpt_path
+
+    def on_test_end(self, logs=None):
+        acc = float(logs['accuracy'])
+        if acc > self.best_accuracy:
+            tf.print("New best Model, saving!")
+            self.best_accuracy = acc
+            self.model_to_save.save_weights(self.cpt_path, True)
+
+
 class AmplitudeTrainingSession:
 
     def __init__(self, params: dict):
@@ -26,12 +42,14 @@ class AmplitudeTrainingSession:
         self.model = self.create_model(params)
 
         # create the model checkpoint manager
-        self.ckpt_dir = './trained_models/amplitude'
+        self.ckpt_dir = 'C:/Users/benny/Documents/SoSe21/DeepL/ubung/deepl-eat-challenge/trained_models/amplitude'
         ckpt_path = self.ckpt_dir + "/amplitude.ckpt"
         # ckpt_path = self.ckpt_dir + "/amplitude-{epoch:04d}.ckpt"
         self.model_ckpt_callback = ModelCheckpoint(
             filepath=ckpt_path, save_weights_only=False,
             monitor='val_accuracy', mode='max', save_best_only=True)
+
+        self.custom_callback = CustomCallback(ckpt_path, self.model)
 
         # create the tensorboard logger
         logdir = './logs/amplitude/amplitude' + datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -95,7 +113,7 @@ class AmplitudeTrainingSession:
             # do the training by fitting the model to the training dataset
             self.model.fit(x=self.train_data, epochs=self.params['num_epochs'],
                            validation_data=self.eval_data,
-                           callbacks=[self.tb_callback, self.model_ckpt_callback])
+                           callbacks=[self.tb_callback, self.custom_callback])  # self.model_ckpt_callback,
 
         # evaluate the 'best' model checkpoint on the test dataset
         self.load_best_model()
