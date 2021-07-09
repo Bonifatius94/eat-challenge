@@ -1,4 +1,3 @@
-
 # Deep Learning - EAT Challenge
 
 ## About
@@ -58,7 +57,7 @@ Remark: Use a GPU empowered machine for amplitude training (although it won't be
 
 | Training  | Approach Description                                     | Test Acc. | Real Acc. |
 | --------- | -------------------------------------------------------- | --------- | --------- |
-| Naive     | Train on audio melspectrograms using Conv2D              |      0.41 |      ?.?? |
-| Noisy     | Train on audio melspectrograms using custom noisy Conv2D |      0.44 |      ?.?? |
+| Naive     | Train on audio melspectrograms using Conv2D              |      0.41 |      0.36 |
+| Noisy     | Train on audio melspectrograms using custom noisy Conv2D |      0.44 |      0.39 |
 | Amplitude | Train on audio amplitude using Conv1D                    |      0.23 |      ?.?? |
 | AutoEnc   | Train on audio melspectrograms using an Auto Encoder     |      0.25 |      ?.?? |
