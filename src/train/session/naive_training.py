@@ -10,6 +10,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from dataset import DatasetFactory
 from dataset.core import partition_dataset
 from model import NaiveEatModel
+from model.custom_callbacks import SaveBestModelCallbackFactory
 
 
 class NaiveTrainingSession:
@@ -28,10 +29,7 @@ class NaiveTrainingSession:
         # create the model checkpoint manager
         self.ckpt_dir = './trained_models/naive'
         ckpt_path = self.ckpt_dir + "/naive.ckpt"
-        # ckpt_path = self.ckpt_dir + "/naive-{epoch:04d}.ckpt"
-        self.model_ckpt_callback = ModelCheckpoint(
-            filepath=ckpt_path, save_weights_only=False,
-            monitor='val_accuracy', mode='max', save_best_only=True)
+        self.model_ckpt_callback = SaveBestModelCallbackFactory().get_callback(ckpt_path)
 
         # create the tensorboard logger
         logdir = './logs/naive/naive' + datetime.now().strftime("%Y%m%d-%H%M%S")

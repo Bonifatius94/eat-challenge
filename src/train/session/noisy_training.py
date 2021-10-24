@@ -9,14 +9,13 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 
 from dataset import DatasetFactory
 from model import NoisyEatModel
+from model.custom_callbacks import SaveBestModelCallbackFactory
 
 
 class NoisyTrainingSession:
 
     def __init__(self, params: dict):
         super(NoisyTrainingSession, self).__init__()
-
-        # TODO: rework training to fit the new config file parameters
 
         self.params = params
 
@@ -27,10 +26,7 @@ class NoisyTrainingSession:
         # create model checkpoint manager
         self.ckpt_dir = './trained_models/noisy'
         ckpt_path = self.ckpt_dir + "/noisy.ckpt"
-        # ckpt_path = self.ckpt_dir + "/noisy-{epoch:04d}.ckpt"
-        self.model_ckpt_callback = ModelCheckpoint(
-            filepath=ckpt_path, save_weights_only=False,
-            monitor='val_accuracy', mode='max', save_best_only=True)
+        self.model_ckpt_callback = SaveBestModelCallbackFactory().get_callback(ckpt_path)
 
         # create tensorboard logger
         logdir = './logs/noisy/noisy' + datetime.now().strftime("%Y%m%d-%H%M%S")

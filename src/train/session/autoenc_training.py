@@ -10,6 +10,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from dataset import DatasetFactory
 from dataset.core import partition_dataset
 from model import AutoEncEatModel, AutoEncClassifModel
+from model.custom_callbacks import SaveBestModelCallbackFactory
 
 
 class AutoEncTrainingSession:
@@ -27,11 +28,8 @@ class AutoEncTrainingSession:
 
         # create the model checkpoint manager
         self.ckpt_dir = './trained_models/autoenc'
-
         ckpt_path = self.ckpt_dir + "/autoenc.ckpt"
-        self.model_ckpt_callback = ModelCheckpoint(
-            filepath=ckpt_path, save_weights_only=False,
-            monitor='val_accuracy', mode='max', save_best_only=True)
+        self.model_ckpt_callback = SaveBestModelCallbackFactory().get_callback(ckpt_path)
 
         # create the tensorboard logger
         logdir = './logs/autoenc/autoenc' + datetime.now().strftime("%Y%m%d-%H%M%S")
