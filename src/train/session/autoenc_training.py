@@ -40,6 +40,8 @@ class AutoEncTrainingSession:
 
     def load_dataset(self, params: dict):
 
+        # TODO: use refactored dataset
+
         # load the tfrecord melspec training dataset
         factory = DatasetFactory()
         dataset = factory.load_dataset(params['dataset_specifier'], params, train=True)
