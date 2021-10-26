@@ -8,6 +8,8 @@
     "num_test_samples": 469,
     "num_classes": 7,
     "inputs_shape": [128, 128, 1],
+    "train_speaker_ids": [14, 3, 27, 16, 22, 30, 31, 4, 1, 5, 26, 19, 18, 29, 15],
+    "test_speaker_ids": [23, 24, 20, 8, 25],
 
     "multi_shard": false,
     "seconds_per_shard": 4,

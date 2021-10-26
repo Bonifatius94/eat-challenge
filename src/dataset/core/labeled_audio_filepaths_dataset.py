@@ -21,7 +21,7 @@ def load_dataset(dataset_path: str='./dataset', train: bool=True):
     return dataset
 
 
-def label_or_sampleid_func(dataset_path, train):
+def label_or_sampleid_func(dataset_path: str, train: bool):
 
     # prepare funcs for sample id extraction from audio file paths
     get_sample_id = lambda file: os.path.basename(file[:-4])
@@ -40,7 +40,7 @@ def label_or_sampleid_func(dataset_path, train):
     return pyfunc_load_label_or_sample_id
 
 
-def load_labels_by_sample_id(dataset_path, train):
+def load_labels_by_sample_id(dataset_path: str, train: bool):
 
     # load labels from CSV file
     wildcard = mode2wildcard(train)
